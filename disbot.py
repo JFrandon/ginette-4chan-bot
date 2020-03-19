@@ -25,7 +25,7 @@ async def hp(ctx):
 
 
 @commands.command()
-async def post(ctx, arg):
+async def post(ctx, arg=None):
     try:
         post = chan.get_random_post(arg)
         embed = Embed(title=post.get_text())

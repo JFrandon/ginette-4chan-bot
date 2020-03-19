@@ -33,7 +33,7 @@ class Thread:
 
     def _api(self):
         try:
-            return requests.get(f"https://api.4chan.org/{self.board}/thread/{self.number}.json").json()
+            return requests.get(f"https://api.4chan.org/{self.board}/thread/{self.number}.json").text
         finally:
             time.sleep(1)
 
@@ -76,7 +76,7 @@ class Board:
 
     def _api(self, uri):
         try:
-            return requests.get(f"https://api.4chan.org/{self.board}/{uri}").json()
+            return requests.get(f"https://api.4chan.org/{self.board}/{uri}").text
         finally:
             time.sleep(1)
 
