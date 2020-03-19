@@ -1,0 +1,130 @@
+import requests
+import random
+import json
+import time
+from datetime import datetime
+
+cache_limit = 900 # 15 min in seconds
+
+
+class ChanError(Exception):
+    message = "Chan Error"
+
+
+class BoardError(ChanError):
+    def __init__(self, board):
+        self.message = f"Specified board {board} could not be reached"
+
+
+class ThreadError(ChanError):
+    def __init__(self, post):
+        self.message = f"Specified post {post} is not the OP of a thread"
+
+
+class Thread:
+    def __init__(self, board, number, op, img="", text=""):
+        self.time = 0
+        self.board = board
+        self.number = number
+        self.op = op
+        self.img = img
+        self.text = text
+        self.replies = list()
+
+    def _api(self):
+        try:
+            return requests.get(f"https://api.4chan.org/{self.board}/thread/{self.number}.json").json()
+        finally:
+            time.sleep(1)
+
+    def get_replies(self):
+        if self.op is not None:
+            return []
+        if datetime.now().timestamp() > self.time + cache_limit and self.replies:
+            return self.replies
+        try:
+            replies = json.loads(self._api()).get("posts")
+            for reply in replies:
+                r = Thread(self.board, reply.get("no"), self,
+                           img=reply.get("tim", "")+reply.get("ext", ""),
+                           text=reply.get("com", ""))
+                self.replies.append(r)
+            self.time = datetime.now().timestamp()
+        except KeyError as e:
+            raise ThreadError(self.number)
+        self.img = replies[0].img
+        self.text = replies[0].text
+
+    def get_text(self):
+        return self.text if self.text else self.op.text
+
+    def get_img(self):
+        img = self.img if self.img else self.op.img
+        return f"https://i.4cdn.org/{self.board}/{img}"
+
+    def get_random_reply(self):
+        return random.choice(self.get_replies())
+
+
+class Board:
+
+    def __init__(self,b, title):
+        self.board = b
+        self.title = title
+        self.threads = list()
+        self.time = 0
+
+    def _api(self, uri):
+        try:
+            return requests.get(f"https://api.4chan.org/{self.board}/{uri}").json()
+        finally:
+            time.sleep(1)
+
+    def _add_thread(self, no):
+        self.threads.append(Thread(self.board, no, None))
+
+    def get_threads(self):
+        if datetime.now().timestamp() > self.time + cache_limit and self.threads:
+            return self.threads
+        threads = json.loads(self._api("1.json"))
+        self.time = datetime.now().timestamp()
+        for thread in threads:
+            if thread.get("sticky", False): continue
+            self._add_thread(thread.get("no"))
+        return self.threads
+
+    def get_random_thread(self):
+        return random.choice(self.get_threads())
+
+
+class Chan:
+
+    boards = {}
+
+    @staticmethod
+    def _api(uri):
+        try:
+            return requests.get("https://api.4chan.org/" + uri).text
+        finally:
+            time.sleep(1)
+
+    def get_boards(self):
+        if self.boards:
+            return self.boards
+        boards_json = self._api("boards.json")
+        boards = json.loads(boards_json)["boards"]
+        for board in boards:
+            self.boards[board["board"]] = Board(board.get("board"),board.get("title"))
+        return self.boards
+
+    def get_board(self, b):
+        try:
+            return self.get_boards().get(b)
+        except KeyError:
+            raise BoardError(b)
+
+    def get_random_post(self, board=""):
+        board = random.choice(self.get_boards().values()) if not board else self.get_board(board)
+        thread = board.get_random_thread()
+        post = thread.get_random_reply()
+        return post
