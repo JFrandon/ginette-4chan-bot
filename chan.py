@@ -86,7 +86,7 @@ class Board:
     def get_threads(self):
         if datetime.now().timestamp() > self.time + cache_limit and self.threads:
             return self.threads
-        threads = json.loads(self._api("1.json"))
+        threads = json.loads(self._api("1.json")).get("posts")
         self.time = datetime.now().timestamp()
         for thread in threads:
             if thread.get("sticky", False): continue
