@@ -20,7 +20,7 @@ async def echo(ctx, *args):
 
 
 @commands.command()
-async def help(ctx):
+async def hp(ctx):
     await ctx.send(HELPSTRING)
 
 
