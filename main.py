@@ -7,7 +7,9 @@ token = 'Your Token'
 
 def main():
     bot = commands.Bot(command_prefix='G.')
-    bot.add_listener(on_ready)
+    @bot.event
+    async def on_ready():
+        print('Bot is ready...')
     bot.add_command(echo)
     bot.add_command(help)
     bot.add_command(post)

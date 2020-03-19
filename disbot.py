@@ -14,11 +14,6 @@ Valid Commands:
 """
 
 
-@commands.event
-async def on_ready():
-    print('Bot is ready...')
-
-
 @commands.command()
 async def echo(ctx, *args):
     await ctx.send(" ".join(args))
