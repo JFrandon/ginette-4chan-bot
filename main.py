@@ -11,7 +11,7 @@ def main():
     async def on_ready():
         print('Bot is ready...')
     bot.add_command(echo)
-    bot.add_command(help)
+    bot.add_command(hp)
     bot.add_command(post)
     bot.run(token)
 
