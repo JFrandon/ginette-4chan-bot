@@ -46,14 +46,15 @@ class Thread:
             replies = json.loads(self._api()).get("posts")
             for reply in replies:
                 r = Thread(self.board, reply.get("no"), self,
-                           img=reply.get("tim", "")+reply.get("ext", ""),
+                           img=str(reply.get("tim", ""))+reply.get("ext", ""),
                            text=reply.get("com", ""))
                 self.replies.append(r)
             self.time = datetime.now().timestamp()
         except KeyError as e:
             raise ThreadError(self.number)
-        self.img = replies[0].img
-        self.text = replies[0].text
+        self.img = self.replies[0].img
+        self.text = self.replies[0].text
+        return self.replies
 
     def get_text(self):
         return self.text if self.text else self.op.text
@@ -86,9 +87,10 @@ class Board:
     def get_threads(self):
         if datetime.now().timestamp() > self.time + cache_limit and self.threads:
             return self.threads
-        threads = json.loads(self._api("1.json")).get("posts")
+        threads = json.loads(self._api("1.json")).get("threads")
         self.time = datetime.now().timestamp()
         for thread in threads:
+            thread = thread.get("posts")[0]
             if thread.get("sticky", False): continue
             self._add_thread(thread.get("no"))
         return self.threads
@@ -124,7 +126,7 @@ class Chan:
             raise BoardError(b)
 
     def get_random_post(self, board=""):
-        board = random.choice(self.get_boards().values()) if not board else self.get_board(board)
+        board = random.choice(list(self.get_boards().values())) if not board else self.get_board(board)
         thread = board.get_random_thread()
         post = thread.get_random_reply()
         return post

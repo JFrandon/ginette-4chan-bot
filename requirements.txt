@@ -1,2 +1,3 @@
 discord
 requests
+html2text

@@ -1,4 +1,3 @@
-import discord, requests, random, json, time, webbrowser
 from disbot import *
 from discord.ext import commands
 

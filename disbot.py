@@ -1,6 +1,7 @@
 from chan import Chan, ChanError
 from discord.ext import commands
 from discord import Embed
+from html2text import html2text
 
 chan = Chan()
 
@@ -28,8 +29,6 @@ async def hp(ctx):
 async def post(ctx, arg=""):
     try:
         post = chan.get_random_post(arg)
-        embed = Embed(title=post.get_text())
-        embed.set_image(url=post.get_img())
-        ctx.send(embed=embed)
+        await ctx.send(f"{html2text(post.get_text())[:250]}{post.get_img()}")
     except ChanError as e:
-        ctx.send(e.message)
+        await ctx.send(e.message)
