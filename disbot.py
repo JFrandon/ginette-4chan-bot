@@ -7,11 +7,12 @@ chan = Chan()
 
 HELPSTRING = """Ginette Bot (JFrandon Edition [original code by RF-Studio]):
 Prefix: G.
-Valid Commands: 
+Valid Commands:
     help: displays this message
     echo <string>: displays a the provided sting
     post: displays a random post from 4chan
     post <board>: displays a random post from the specified 4chan board
+    disp <thread URL> : displays the thread your enter the URL
 """
 
 
@@ -26,9 +27,27 @@ async def hp(ctx):
 
 
 @commands.command()
-async def post(ctx, arg=""):
+async def post(ctx, arg="", thread=""):
     try:
-        post = chan.get_random_post(arg)
-        await ctx.send(f"{html2text(post.get_text())[:250]}{post.get_img()}")
+        poste = None
+        if thread:
+            poste = chan.get_random_reply(arg,thread)
+        else:
+            poste = chan.get_random_post(arg)
+        await ctx.send(f"{html2text(poste.get_text())[:250]}{poste.get_img()}")
+    except ChanError as e:
+        await ctx.send(e.message)
+
+@commands.command()
+async def disp(ctx, *args):
+    try:
+        """get url and display it"""
+    except ChanError as e:
+        await ctx.send(e.message)
+
+@commands.command()
+async def info(ctx, arg=""):
+    try:
+
     except ChanError as e:
         await ctx.send(e.message)

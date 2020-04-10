@@ -1,7 +1,7 @@
 from disbot import *
 from discord.ext import commands
 
-token = 'Your Token'
+token = 'Njg5OTMxNDg1NjkxNzcyOTUw.XnNNgQ.BDCJqRDF96mDx0pgWmB3lNKU9gE'
 
 
 def main():
