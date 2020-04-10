@@ -255,7 +255,11 @@ class URL_Thread:
 
 class Info:
 
-    def __init__(self, board):
+    def __init__(self, board, title, meta_description):
         self.board = board
+        self.title = title
+        self.meta_description = meta_description
 
-    def  get_info_board(self):
+    def get_info_board(self):
+        if self.board == "o":
+            return f"**Title :** {self.title} **Description :** {self.meta_description}"
