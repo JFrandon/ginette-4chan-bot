@@ -48,7 +48,6 @@ async def disp(ctx, *args):
 @commands.command()
 async def info(ctx, arg=""):
     try:
-        board_info = Info.get_info_board(arg)
-        await ctx.send(board_info)
+        await ctx.send(f"Infos : {html2text(chan.get_board(arg).get_info())}")
     except ChanError as e:
         await ctx.send(e.message)

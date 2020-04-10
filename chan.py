@@ -69,11 +69,12 @@ class Thread:
 
 class Board:
 
-    def __init__(self,b, title):
+    def __init__(self, b, title, description):
         self.board = b
         self.title = title
         self.threads = list()
         self.time = 0
+        self.description = description
 
     def _api(self, uri):
         try:
@@ -98,6 +99,9 @@ class Board:
     def get_random_thread(self):
         return random.choice(self.get_threads())
 
+    def get_description(self):
+        return self.description
+
 
 class Chan:
 
@@ -116,7 +120,7 @@ class Chan:
         boards_json = self._api("boards.json")
         boards = json.loads(boards_json)["boards"]
         for board in boards:
-            self.boards[board["board"]] = Board(board.get("board"),board.get("title"))
+            self.boards[board["board"]] = Board(board.get("board"),board.get("title"),board.get("meta_description"))
         return self.boards
 
     def get_board(self, b):
