@@ -12,17 +12,17 @@ class ChanError(Exception):
 
 
 class BoardError(ChanError):
-    def __init__(self, board):
+    def __init__(self, board, *args):
         self.message = f"Specified board {board} could not be reached"
 
 
 class ThreadError(ChanError):
-    def __init__(self, post):
+    def __init__(self, post, *args):
         self.message = f"Specified post {post} is not the OP of a thread"
 
 
 class Thread:
-    def __init__(self, board, number, op, img="", text=""):
+    def __init__(self, board, number, op, img="", text="", *args):
         self.time = 0
         self.board = board
         self.number = number
@@ -69,7 +69,7 @@ class Thread:
 
 class Board:
 
-    def __init__(self, b, title, description):
+    def __init__(self, b, title, description, *args):
         self.board = b
         self.title = title
         self.threads = list()
@@ -102,6 +102,9 @@ class Board:
     def get_description(self):
         return self.description
 
+    def get_info(self):
+        return f"Title : {self.title}<br/>Description : {self.description}"
+
 
 class Chan:
 
@@ -120,7 +123,11 @@ class Chan:
         boards_json = self._api("boards.json")
         boards = json.loads(boards_json)["boards"]
         for board in boards:
-            self.boards[board["board"]] = Board(board.get("board"),board.get("title"),board.get("meta_description"))
+            b = board.get("board")
+            t = board.get("title")
+            m = board.get("meta_description")
+            obj = Board(b,t,m)
+            self.boards[b] = obj
         return self.boards
 
     def get_board(self, b):
@@ -136,7 +143,7 @@ class Chan:
         return post
 
 class Thread:
-    def __init__(self, board, number, op, img="", text=""):
+    def __init__(self, board, number, op, img="", text="", *args):
         self.time = 0
         self.board = board
         self.number = number
@@ -179,41 +186,9 @@ class Thread:
 
     def get_random_reply(self):
         return random.choice(self.get_replies())
-
-
-class Board:
-
-    def __init__(self,b, title):
-        self.board = b
-        self.title = title
-        self.threads = list()
-        self.time = 0
-
-    def _api(self, uri):
-        try:
-            return requests.get(f"https://api.4chan.org/{self.board}/{uri}").text
-        finally:
-            time.sleep(1)
-
-    def _add_thread(self, no):
-        self.threads.append(Thread(self.board, no, None))
-
-    def get_threads(self):
-        if datetime.now().timestamp() > self.time + cache_limit and self.threads:
-            return self.threads
-        threads = json.loads(self._api("1.json")).get("threads")
-        self.time = datetime.now().timestamp()
-        for thread in threads:
-            thread = thread.get("posts")[0]
-            if thread.get("sticky", False): continue
-            self._add_thread(thread.get("no"))
-        return self.threads
-
-    def get_random_thread(self):
-        return random.choice(self.get_threads())
 
 class URL_Thread:
-    def __init__(self, board, number, op, img="", text=""):
+    def __init__(self, board, number, op, img="", text="", *args):
         self.time = 0
         self.board = board
         self.number = number
@@ -256,14 +231,3 @@ class URL_Thread:
 
     def get_random_reply(self):
         return random.choice(self.get_replies())
-
-class Info:
-
-    def __init__(self, board, title, meta_description):
-        self.board = board
-        self.title = title
-        self.meta_description = meta_description
-
-    def get_info_board(self):
-        if self.board == "o":
-            return f"**Title :** {self.title} **Description :** {self.meta_description}"
