@@ -13,7 +13,7 @@ Valid Commands:
     echo <string>: displays a the provided sting
     post: displays a random post from 4chan
     post <board>: displays a random post from the specified 4chan board
-    info <board>: 
+    info <board>: get title and description of the specified 4chan board
 """
 
 
