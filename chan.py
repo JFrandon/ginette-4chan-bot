@@ -12,17 +12,17 @@ class ChanError(Exception):
 
 
 class BoardError(ChanError):
-    def __init__(self, board, *args):
+    def __init__(self, board):
         self.message = f"Specified board {board} could not be reached"
 
 
 class ThreadError(ChanError):
-    def __init__(self, post, *args):
+    def __init__(self, post):
         self.message = f"Specified post {post} is not the OP of a thread"
 
 
 class Thread:
-    def __init__(self, board, number, op, img="", text="", *args):
+    def __init__(self, board, number, op, img="", text=""):
         self.time = 0
         self.board = board
         self.number = number
@@ -69,7 +69,7 @@ class Thread:
 
 class Board:
 
-    def __init__(self, b, title, description, *args):
+    def __init__(self, b, title, description):
         self.board = b
         self.title = title
         self.threads = list()
