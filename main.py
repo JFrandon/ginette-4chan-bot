@@ -1,7 +1,7 @@
 from disbot import *
 from discord.ext import commands
 
-token = 'Your Token'
+token = 'Your token'
 
 
 def main():
@@ -12,6 +12,7 @@ def main():
     bot.add_command(echo)
     bot.add_command(hp)
     bot.add_command(post)
+    bot.add_command(info)
     bot.run(token)
 
 
