@@ -58,5 +58,6 @@ def get_time():  # getting time
         nt = ""
         for i in range(19):
             nt += t[i]
+        return nt
     except TimeError as e:
         print(e.message)
