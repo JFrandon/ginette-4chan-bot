@@ -57,6 +57,6 @@ def get_time():  # getting time
         t = str(datetime.now())
         nt = ""
         for i in range(19):
-            nt[i] = t[i]
+            nt += t[i]
     except TimeError as e:
         print(e.message)
