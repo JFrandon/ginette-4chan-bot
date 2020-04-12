@@ -53,4 +53,4 @@ def get_time():  # getting time
         t = time.strftime("%Y-%m-%d | %H:%M:%S | ")
         return t
     except TimeoutError:
-        print("Error getting time | TIME OUT")
+        print("Error getting time | TIME OUT | ")
