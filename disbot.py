@@ -2,7 +2,7 @@ from chan import Chan, ChanError
 from discord.ext import commands
 from discord import Embed
 from html2text import html2text
-from datetime import datetime
+import time
 
 chan = Chan()
 
@@ -48,16 +48,9 @@ async def info(ctx, arg=""):
         await ctx.send(e.message)
 
 
-class TimeError(Exception):
-    message = "Error getting time"
-
-
 def get_time():  # getting time
     try:
-        t = str(datetime.now())
-        nt = ""
-        for i in range(19):
-            nt += t[i]
-        return nt
-    except TimeError as e:
-        print(e.message)
+        t = time.strftime("%Y-%m-%d | %H:%M:%S | ")
+        return t
+    except TimeoutError:
+        print("Error getting time | TIME OUT")
