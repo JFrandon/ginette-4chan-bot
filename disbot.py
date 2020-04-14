@@ -14,6 +14,7 @@ Valid Commands:
     post: displays a random post from 4chan
     post <board>: displays a random post from the specified 4chan board
     info <board>: get title and description of the specified 4chan board
+    info : get url and title of every 4chan board
 """
 
 
@@ -34,16 +35,16 @@ async def post(ctx, arg=""):
     try:
         print(get_time()+"| Post requested on board : " + arg)
         display_post = chan.get_random_post(arg)
-        await ctx.send(f"{html2text(display_post.get_text())[:250]}{display_post.get_img()}")
+        await ctx.send(f"```{html2text(display_post.get_text())[:500]}```{display_post.get_img()}")
     except ChanError as e:
         await ctx.send(e.message)
 
 
 @commands.command()
 async def info(ctx, arg=""):
+    print(get_time() + "| Board " + arg + " info requested")
     try:
-        print(get_time()+"| Board " + arg + " info requested")
-        await ctx.send(html2text(chan.get_board(arg).get_info()))
+        await ctx.send("```"+html2text(chan.get_info(arg))+"```")
     except ChanError as e:
         await ctx.send(e.message)
 

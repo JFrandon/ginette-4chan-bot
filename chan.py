@@ -105,6 +105,9 @@ class Board:
     def get_info(self):
         return f"Title : {self.title}<br/>Description : {self.description}"
 
+    def get_summary(self):
+        return f"/{self.board}/ {self.title}"
+
 
 class Chan:
 
@@ -132,7 +135,7 @@ class Chan:
 
     def get_board(self, b):
         try:
-            return self.get_boards().get(b)
+            return self.get_boards()[b]
         except KeyError:
             raise BoardError(b)
 
@@ -141,3 +144,9 @@ class Chan:
         thread = board.get_random_thread()
         post = thread.get_random_reply()
         return post
+
+    def get_info(self, board=""):
+        if board:
+            return self.get_board(board).get_info()
+        else:
+            return "<br/>".join(map(lambda b: b.get_summary(), self.get_boards().values()))
