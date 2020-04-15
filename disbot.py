@@ -1,12 +1,12 @@
 from chan import Chan, ChanError
+from reactions import with_reactions, register_post_reactions
 from discord.ext import commands
-import discord
-from discord import Embed
 from html2text import html2text
 import time
 
 chan = Chan()
 bot = commands.Bot(command_prefix='G.')
+
 
 HELPSTRING = """Ginette Bot (JFrandon Edition [original code by RF-Studio]):
 Prefix: G.
@@ -21,38 +21,41 @@ Valid Commands:
 
 
 @commands.command()
+@with_reactions()
 async def echo(ctx, *args):
-    print(get_time()+'| echo requested : ' + args)
-    message = await ctx.send(" ".join(args))
-    await message.add_reaction("\U0001F5D1")
+    print(get_time()+'| echo requested : ' + " ".join(args))
+    return await ctx.send(" ".join(args))
 
 
 @commands.command()
+@with_reactions()
 async def hp(ctx):
     print(get_time()+'| Help requested')
-    message = await ctx.send(HELPSTRING)
-    await message.add_reaction("\U0001F5D1")
+    return await ctx.send(HELPSTRING)
 
 
 @commands.command()
+@with_reactions(True)
 async def post(ctx, b="", t="", p=""):
     try:
         print(get_time()+f"| Post {p} requested on board {b} thread {t} ")
         display_post = chan.get_post(b, t, p)
-        message = await ctx.send(f"{display_post.get_uri()} ```{html2text(display_post.get_text())[:1500]}```{display_post.get_img()}")
-        await message.add_reaction("\U0001F5D1")
+        message = await ctx.send(f"{display_post.get_uri()} ```{html2text(display_post.get_text())[:1500]}```"
+                                 f"{display_post.get_img()}")
+        #await register_post_reactions(ctx, message, display_post)
+        return message, display_post.board, display_post.get_links()
     except ChanError as e:
-        await ctx.send(e.message)
+        return await ctx.send(e.message)
 
 
 @commands.command()
+@with_reactions()
 async def info(ctx, arg=""):
     print(get_time() + "| Board " + arg + " info requested")
     try:
-        message = await ctx.send("```"+html2text(chan.get_info(arg))+"```")
-        await message.add_reaction("\U0001F5D1")
+        return await ctx.send("```"+html2text(chan.get_info(arg))+"```")
     except ChanError as e:
-        await ctx.send(e.message)
+        return await ctx.send(e.message)
 
 
 def get_time():  # getting time

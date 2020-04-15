@@ -2,9 +2,11 @@ import requests
 import random
 import json
 import time
+import re
 from datetime import datetime
+from html2text import html2text
 
-cache_limit = 900 # 15 min in seconds
+cache_limit = 900  # 15 min in seconds
 
 
 class ChanError(Exception):
@@ -19,6 +21,7 @@ class BoardError(ChanError):
 class ThreadError(ChanError):
     def __init__(self, post):
         self.message = f"Specified post {post} is not the OP of a thread"
+
 
 class PostError(ChanError):
     def __init__(self, post, thread):
@@ -43,7 +46,7 @@ class Thread:
 
     def get_replies(self):
         if self.op is not None:
-            return []
+            return dict()
         if datetime.now().timestamp() > self.time + cache_limit and self.replies:
             return self.replies
         try:
@@ -80,6 +83,9 @@ class Thread:
         op_n = self.number if not self.op else self.op.number
         return f"{self.board} {op_n} {self.number}"
 
+    def get_links(self):
+        op_n = self.number if not self.op else self.op.number
+        return [str(op_n)] + list(re.findall(">>(\\d+)", html2text(self.text)))
 
 class Board:
 
