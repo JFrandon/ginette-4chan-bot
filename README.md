@@ -5,4 +5,4 @@ Rework of [RF-Studio](https://github.com/RF-Studio)'s [work](https://github.com/
 
 # ressources
 
-. [emoji to unicode](http://www.fileformat.info/)
+. [emoji to unicode](http://www.fileformat.info/info/unicode/char/search.htm)
