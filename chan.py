@@ -20,6 +20,10 @@ class ThreadError(ChanError):
     def __init__(self, post):
         self.message = f"Specified post {post} is not the OP of a thread"
 
+class PostError(ChanError):
+    def __init__(self, post, thread):
+        self.message = f"Specified post {post} is not a post of thread {thread}"
+
 
 class Thread:
     def __init__(self, board, number, op, img="", text=""):
@@ -29,7 +33,7 @@ class Thread:
         self.op = op
         self.img = img
         self.text = text
-        self.replies = list()
+        self.replies = dict()
 
     def _api(self):
         try:
@@ -48,12 +52,12 @@ class Thread:
                 r = Thread(self.board, reply.get("no"), self,
                            img=str(reply.get("tim", ""))+reply.get("ext", ""),
                            text=reply.get("com", ""))
-                self.replies.append(r)
+                self.replies[reply.get("no")] = r
             self.time = datetime.now().timestamp()
         except KeyError as e:
             raise ThreadError(self.number)
-        self.img = self.replies[0].img
-        self.text = self.replies[0].text
+        self.img = self.replies[self.number].img
+        self.text = self.replies[self.number].text
         return self.replies
 
     def get_text(self):
@@ -64,7 +68,17 @@ class Thread:
         return f"https://i.4cdn.org/{self.board}/{img}"
 
     def get_random_reply(self):
-        return random.choice(self.get_replies())
+        return random.choice(list(self.get_replies().values()))
+
+    def get_reply(self, no):
+        try:
+            return self.get_replies()[no]
+        except KeyError as e:
+            raise PostError(no, self.number)
+
+    def get_uri(self):
+        op_n = self.number if not self.op else self.op.number
+        return f"{self.board} {op_n} {self.number}"
 
 
 class Board:
@@ -72,7 +86,7 @@ class Board:
     def __init__(self, b, title, description):
         self.board = b
         self.title = title
-        self.threads = list()
+        self.threads = dict()
         self.time = 0
         self.description = description
 
@@ -83,7 +97,7 @@ class Board:
             time.sleep(1)
 
     def _add_thread(self, no):
-        self.threads.append(Thread(self.board, no, None))
+        self.threads[no] = (Thread(self.board, no, None))
 
     def get_threads(self):
         if datetime.now().timestamp() > self.time + cache_limit and self.threads:
@@ -98,7 +112,13 @@ class Board:
         return self.threads
 
     def get_random_thread(self):
-        return random.choice(self.get_threads())
+        return random.choice(list(self.get_threads().values()))
+
+    def get_thread(self, no):
+        try:
+            return self.get_threads()[no]
+        except KeyError as e:
+            raise ThreadError(no)
 
     def get_description(self):
         return self.description
@@ -140,11 +160,21 @@ class Chan:
         except KeyError:
             raise BoardError(b)
 
-    def get_random_post(self, board=""):
-        board = random.choice(list(self.get_boards().values())) if not board else self.get_board(board)
-        thread = board.get_random_thread()
-        post = thread.get_random_reply()
-        return post
+    def get_post(self, board="", thread="", post=""):
+        if not board:
+            board = random.choice(list(self.get_boards().values()))
+        else:
+            board = self.get_board(board)
+        if not thread:
+            thread = board.get_random_thread()
+        else:
+            thread = board.get_thread(int(thread))
+        if not post:
+            return thread.get_random_reply()
+        elif post == "op":
+            return thread.get_reply(thread.number)
+        else:
+            return thread.get_reply(int(post))
 
     def get_info(self, board=""):
         if board:

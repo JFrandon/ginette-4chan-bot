@@ -31,11 +31,11 @@ async def hp(ctx):
 
 
 @commands.command()
-async def post(ctx, arg=""):
+async def post(ctx, b="", t="", p=""):
     try:
-        print(get_time()+"| Post requested on board : " + arg)
-        display_post = chan.get_random_post(arg)
-        await ctx.send(f"```{html2text(display_post.get_text())[:500]}```{display_post.get_img()}")
+        print(get_time()+f"| Post {p} requested on board {b} thread {t} ")
+        display_post = chan.get_post(b, t, p)
+        await ctx.send(f"{display_post.get_uri()} ```{html2text(display_post.get_text())[:1500]}```{display_post.get_img()}")
     except ChanError as e:
         await ctx.send(e.message)
 
