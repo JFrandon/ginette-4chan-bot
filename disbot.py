@@ -1,5 +1,5 @@
 from chan import Chan, ChanError
-from reactions import with_reactions, register_post_reactions
+from reactions import with_reactions
 from discord.ext import commands
 from html2text import html2text
 import time
@@ -24,14 +24,14 @@ Valid Commands:
 @with_reactions()
 async def echo(ctx, *args):
     print(get_time()+'| echo requested : ' + " ".join(args))
-    return await ctx.send(" ".join(args))
+    return await ctx.send(" ".join(args)), None
 
 
 @commands.command()
 @with_reactions()
 async def hp(ctx):
     print(get_time()+'| Help requested')
-    return await ctx.send(HELPSTRING)
+    return await ctx.send(HELPSTRING), None
 
 
 @commands.command()
@@ -39,13 +39,13 @@ async def hp(ctx):
 async def post(ctx, b="", t="", p=""):
     try:
         print(get_time()+f"| Post {p} requested on board {b} thread {t} ")
+        message = await ctx.send("I'm searching a post...")
         display_post = chan.get_post(b, t, p)
-        message = await ctx.send(f"{display_post.get_uri()} ```{html2text(display_post.get_text())[:1500]}```"
-                                 f"{display_post.get_img()}")
-        #await register_post_reactions(ctx, message, display_post)
+        await message.edit(content=f"{display_post.get_uri()} ```{html2text(display_post.get_text())[:1500]}```"
+                            f"{display_post.get_img()}")
         return message, display_post.board, display_post.get_links()
     except ChanError as e:
-        return await ctx.send(e.message)
+        return await ctx.send(e.message), None
 
 
 @commands.command()
@@ -53,9 +53,11 @@ async def post(ctx, b="", t="", p=""):
 async def info(ctx, arg=""):
     print(get_time() + "| Board " + arg + " info requested")
     try:
-        return await ctx.send("```"+html2text(chan.get_info(arg))+"```")
+        message = await ctx.send("I'm searching some your informations")
+        await message.edit(content="```"+html2text(chan.get_info(arg))+"```")
+        return message, None
     except ChanError as e:
-        return await ctx.send(e.message)
+        return await ctx.send(e.message), None
 
 
 def get_time():  # getting time
@@ -65,8 +67,3 @@ def get_time():  # getting time
     except TimeoutError:
         print("Error getting time | TIME OUT | ")
 
-
-@bot.event
-async def on_reaction_trash(reaction, user):
-    reaction.message.on_reaction_add()
-    print("delete")

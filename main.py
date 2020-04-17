@@ -1,7 +1,8 @@
 from disbot import *
 from discord.ext import commands
+from reactions import get_trashcan_listener
 
-token = 'Your token'
+token = 'Your Token'
 
 
 def main():
@@ -9,6 +10,7 @@ def main():
     @bot.event
     async def on_ready():
         print('Bot is ready...')
+    bot.add_listener(get_trashcan_listener(bot),"on_raw_reaction_add")
     bot.add_command(echo)
     bot.add_command(hp)
     bot.add_command(post)
