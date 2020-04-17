@@ -2,7 +2,7 @@ from disbot import *
 from discord.ext import commands
 from reactions import get_trashcan_listener
 
-token = 'Njg5OTMxNDg1NjkxNzcyOTUw.XpEKbg.z7elieLM2TRo37JC4BfM0SP87Gc'
+token = 'Your Token'
 
 
 def main():
