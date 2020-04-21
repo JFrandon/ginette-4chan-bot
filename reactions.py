@@ -11,6 +11,7 @@ class FakeMessage(Message):
 
 class Emoji:
     wastebasket = "\U0001F5D1"
+    info_i = 'ℹ️'
 
     @staticmethod
     def get_number(number):
@@ -49,6 +50,21 @@ async def register_post_reactions(ctx, message, board, links):
     ctx.bot.add_listener(links_handler, "on_reaction_add")
     ctx.bot.add_listener(on_message_delete, "on_message_delete")
 
+def get_info_listener(bot):
+    ctx = Context(bot=bot, prefix="", message=FakeMessage())
+    async def info_listener(payload):
+        message_id = payload.message_id
+        channel_id = payload.channel_id
+        message = await MessageConverter().convert(ctx, f"{channel_id}-{message_id}")
+        board = message.content.split(" ")[0]
+        ctx.message = message
+        ctx._state = payload.member._state
+        if payload.member.bot or message.author.id != ctx.bot.user.id:
+            return
+        if payload.emoji.name == Emoji.info_i and board in disbot.chan.get_boards():
+            await disbot.info(ctx, board)
+    return info_listener
+
 
 def with_reactions(post=False):
     def decorator(func):
@@ -57,6 +73,7 @@ def with_reactions(post=False):
             message, *links = await func(ctx, *args, **kwargs)
             await message.add_reaction(Emoji.wastebasket)
             if post:
+                await message.add_reaction(Emoji.info_i)
                 await register_post_reactions(ctx, message, links.pop(0), *links)
         return decorated
     return decorator
