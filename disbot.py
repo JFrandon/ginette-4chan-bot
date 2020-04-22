@@ -24,7 +24,7 @@ Valid Commands:
 @with_reactions()
 async def echo(ctx, *args):
     print(get_time()+'| echo requested : ' + " ".join(args))
-    return await ctx.send(" ".join(args)), None
+    return await ctx.send(" ".join(args), tts=True), None
 
 
 @commands.command()
@@ -53,7 +53,7 @@ async def post(ctx, b="", t="", p=""):
 async def info(ctx, arg=""):
     print(get_time() + "| Board " + arg + " info requested")
     try:
-        message = await ctx.send("I'm searching some your informations")
+        message = await ctx.send("I'm searching some information")
         await message.edit(content="```"+html2text(chan.get_info(arg))+"```")
         return message, None
     except ChanError as e:
